@@ -17,7 +17,7 @@ This proxy allows you to fetch webpages and simplify them for easier reading on 
 ### 1. Clone the repository or download the code.
 
 ```bash
-git clone https://github.com/yourusername/readability-proxy.git
+git clone https://github.com/alexBethke/readability-proxy.git
 cd readability-proxy
 ```
 
