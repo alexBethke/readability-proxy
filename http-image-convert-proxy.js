@@ -178,30 +178,6 @@ app.use(async (req, res) => {
     const dom = new JSDOM(html, { url: targetUrl });
     const document = dom.window.document;
     
-    // Set headers for streaming and keep-alive
-    res.setHeader("Content-Type", "text/html; charset=ISO-8859-1");
-    res.setHeader("Connection", "keep-alive");
-    res.setHeader("Transfer-Encoding", "chunked");
-    res.removeHeader("Content-Length"); // Can't know length when streaming
-    
-    // Strip all CSS links and style tags from head
-    const headClone = document.head.cloneNode(true);
-    headClone.querySelectorAll('link[rel="stylesheet"]').forEach(el => el.remove());
-    headClone.querySelectorAll('style').forEach(el => el.remove());
-    
-    const headHtml = '<!DOCTYPE html>\n<html><head>' + 
-                     '<meta charset="ISO-8859-1">' +
-                     '<title>' + (document.title || 'Loading...') + '</title>' +
-                     '</head><body>';
-    const isoHead = iconv.encode(headHtml, "ISO-8859-1");
-    res.write(isoHead);
-    
-    // Immediately send a loading indicator so user sees something
-    const loadingHtml = '<p><i>Loading page content...</i></p>\n';
-    const isoLoading = iconv.encode(loadingHtml, "ISO-8859-1");
-    res.write(isoLoading);
-    res.flush?.(); // Flush immediately to trigger browser rendering
-    
     // Process all images
     const imagePromises = [];
     
@@ -241,11 +217,22 @@ app.use(async (req, res) => {
     document.querySelectorAll('link[rel="stylesheet"]').forEach(el => el.remove());
     document.querySelectorAll('[style]').forEach(el => el.removeAttribute('style'));
     
-    // Send the body content and closing tags
-    const bodyHtml = document.body.innerHTML + '</body></html>';
-    const isoBody = iconv.encode(bodyHtml, "ISO-8859-1");
-    res.write(isoBody);
-    res.end();
+    // Build complete HTML response
+    const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>${document.title || 'Page'}</title>
+</head>
+<body>
+${document.body.innerHTML}
+</body>
+</html>`;
+    
+    // Convert to ISO-8859-1 and send
+    const isoHtml = iconv.encode(htmlContent, "ISO-8859-1");
+    res.setHeader("Content-Type", "text/html; charset=ISO-8859-1");
+    res.send(isoHtml);
   } catch (error) {
     res.status(500).send(`Error fetching page: ${error.message}`);
   }
