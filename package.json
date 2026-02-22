@@ -6,7 +6,10 @@
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "readability": "node http-readability-proxy.js",
+    "imageconvert": "node http-image-convert-proxy.js",
+    "macgarden": "node http-macgarden-proxy.js"
   },
   "author": "",
   "license": "MIT",
